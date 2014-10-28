@@ -122,10 +122,10 @@ public class MainActivity extends ActionBarActivity {
     public void sendResult( String result){
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String url = sharedPrefs.getString("URL", "h");
+        String url = sharedPrefs.getString("URL", "http://192.168.1.139:9001/api");
         HttpClient httpClient = new DefaultHttpClient();
         // replace with your url
-        HttpPost httpPost = new HttpPost("http://192.168.1.139:9001/api");
+        HttpPost httpPost = new HttpPost(url);
 
 
         //Post Data
