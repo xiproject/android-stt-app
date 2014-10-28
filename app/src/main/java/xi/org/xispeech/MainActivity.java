@@ -1,15 +1,23 @@
 package xi.org.xispeech;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import org.apache.http.HttpResponse;
@@ -31,15 +39,39 @@ public class MainActivity extends ActionBarActivity {
 
     static final String TAG = "MainActivity";
 
-    TextView speechInfo;
+    EditText speechInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        speechInfo = (TextView) findViewById(R.id.speech_info);
-    }
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
+        setContentView(R.layout.activity_main);
+        speechInfo = (EditText) findViewById(R.id.speech_info);
+
+        TextView.OnEditorActionListener exampleListener = new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+
+                if (i == EditorInfo.IME_NULL
+                        && keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+                    sendResult(textView.getText().toString());
+                    textView.setText("");
+                    hideSoftKeyboard();
+
+                }
+                return true;
+            }
+        };
+        speechInfo.setOnEditorActionListener(exampleListener);
+        }
+
+    private void hideSoftKeyboard(){
+        if(getCurrentFocus()!=null && getCurrentFocus() instanceof EditText){
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(speechInfo.getWindowToken(), 0);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -55,6 +87,8 @@ public class MainActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -87,9 +121,11 @@ public class MainActivity extends ActionBarActivity {
 
     public void sendResult( String result){
 
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String url = sharedPrefs.getString("URL", "h");
         HttpClient httpClient = new DefaultHttpClient();
         // replace with your url
-        HttpPost httpPost = new HttpPost("http://192.168.1.7:9001/api");
+        HttpPost httpPost = new HttpPost("http://192.168.1.139:9001/api");
 
 
         //Post Data

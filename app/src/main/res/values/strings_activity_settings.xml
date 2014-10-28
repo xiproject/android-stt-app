@@ -1,0 +1,11 @@
+<resources>
+        <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_url">URL</string>
+    <string name="pref_default_url">http://192.168.1.1:8050</string>
+
+
+</resources>
